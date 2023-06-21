@@ -1,0 +1,1 @@
+const i32_BYTES_SIZE: usize = 4;
