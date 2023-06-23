@@ -16,7 +16,7 @@ const i32_BYTES_SIZE: usize = 4;
 const i16_BYTES_SIZE: usize = 2;
 const u16_BYTES_SIZE: usize = 2;
 
-const DirSize: usize = 16;
+const DIR_SIZE: usize = 16;
 
 #[derive(Debug, Clone)]
 pub struct filSys {
@@ -33,7 +33,6 @@ pub struct filSys {
     s_time: [i16; 2],
     s_pad: [i16; 50],
 }
-
 
 impl filSys {
     pub fn new() -> filSys {
@@ -72,12 +71,8 @@ struct Shell {
 impl Shell {
     pub fn ls(&self, option: &str) {
         match option {
-            "-l" => {
-
-            }
-            _ => {
-
-            }
+            "-l" => {}
+            _ => {}
         }
     }
 }

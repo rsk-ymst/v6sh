@@ -4,14 +4,16 @@ use crate::utils;
 
 use super::{filSys, inode::Inode};
 
-const BLOCK_SIZE: usize = 512;
 const i32_BYTES_SIZE: usize = 4;
 const i16_BYTES_SIZE: usize = 2;
 const u16_BYTES_SIZE: usize = 2;
 
-const DirSize: usize = 16;
+const BLOCK_SIZE: usize = 512;
+const DIR_SIZE: usize = 16;
 
+const DIR_COUNT_PER_BLOCK: usize = BLOCK_SIZE / DIR_SIZE;
 
+const INODE_SIZE: usize = 32;
 
 #[derive(Debug)]
 pub struct BlockDeviceParser {
@@ -36,7 +38,11 @@ impl BlockDeviceParser {
         println!("forward: {} --> {}", self.cursor, self.cursor + count);
 
         #[cfg(debug_assertions)]
-        println!("now: {:02x} {:02x}", self.bytes[self.cursor], self.bytes[self.cursor + 1]);
+        println!(
+            "now: {:02x} {:02x}",
+            self.bytes[self.cursor],
+            self.bytes[self.cursor + 1]
+        );
 
         self.cursor += count;
     }
@@ -53,13 +59,6 @@ impl BlockDeviceParser {
         self.forward_cursor(size);
 
         Ok(())
-    }
-
-    fn read_then_consume_i32(&mut self) -> io::Result<i32> {
-        let x = utils::read_i32(&mut self.bytes[self.cursor..self.cursor + i32_BYTES_SIZE]);
-        self.forward_cursor(i32_BYTES_SIZE);
-
-        Ok(x)
     }
 
     fn read_then_consume_i16(&mut self) -> io::Result<i16> {
@@ -248,55 +247,54 @@ impl BlockDeviceParser {
     // }
 
     pub fn create_idx(&mut self, mut node: Inode) -> Inode {
-        // for (i, node) in self.inodes.clone().iter_mut().enumerate() {
-            for i in 0..8 {
-                let offset = (node.i_addr[i] as usize) * BLOCK_SIZE;
-                let mut is_leak = false;
+        for i in 0..8 {
+            /* i_addrから指定ブロックに移動 */
+            let offset = (node.i_addr[i] as usize) * BLOCK_SIZE;
+            let mut is_leak = false;
 
-                for j in 0..(BLOCK_SIZE / DirSize) {
-                    // self.forward_cursor(j * DirSize + offset);
+            /*ディレクトリブロック分繰り返す */
+            for dir_idx in 0..DIR_COUNT_PER_BLOCK {
+                // if j >= ((node.metadata.size as usize - i * (BLOCK_SIZE)) / DIR_SIZE) {
+                //     is_leak = true;
+                //     break;
+                // }
 
-                    if j >= ((node.metadata.size as usize - i * (BLOCK_SIZE)) / DirSize) {
-                        is_leak = true;
-                        break;
-                    }
+                self.cursor = dir_idx * DIR_SIZE + offset;
+                let inode_id = self.read_then_consume_u16().unwrap();
 
-                    self.cursor = j * DirSize + offset;
-                    let num = self.read_then_consume_u16().unwrap();
+                let entry_point = self.cursor;
+                let end_point = self.search_next_zero();
 
-                    let entry_point = self.cursor;
-                    let end_point = self.search_next_zero();
-
-                    if end_point - entry_point <= 0 {
-                        is_leak = true;
-                        break;
-                    }
-
-                    #[cfg(debug_assertions)]
-                    println!("start: {entry_point}, end: {end_point}");
-
-                    let name = std::str::from_utf8(&self.bytes[entry_point..end_point])
-                        .unwrap_or("error")
-                        .to_string();
-                    println!("**********\nextract name: {}", name);
-
-                    if name == "error" {
-                        is_leak = true;
-                        break;
-                    }
-
-                    node.metadata.fTable.insert(name.clone(), num.into());
-                    node.metadata.keys.push(name.clone());
-
-                    // self.inodes[i] = node.clone();
-                }
-
-                if is_leak {
+                if end_point - entry_point <= 0 {
+                    is_leak = true;
                     break;
                 }
 
-                self.cursor = offset;
+                #[cfg(debug_assertions)]
+                println!("start: {entry_point}, end: {end_point}");
+
+                let name = std::str::from_utf8(&self.bytes[entry_point..end_point])
+                    .unwrap_or("error")
+                    .to_string();
+                println!("**********\nextract name: {}", name);
+
+                // if name == "error" {
+                //     is_leak = true;
+                //     break;
+                // }
+
+                node.metadata.fTable.insert(name.clone(), inode_id.into());
+                node.metadata.keys.push(name.clone());
+
+                // self.inodes[i] = node.clone();
             }
+
+            if is_leak {
+                break;
+            }
+
+            // self.cursor = offset;
+        }
         // }
 
         // #[cfg(debug_assertions)]
