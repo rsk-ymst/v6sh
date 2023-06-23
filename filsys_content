@@ -1,0 +1,17 @@
+filSys {
+    s_isize: 85,
+    s_fsize: 4000,
+    s_nfree: 91,
+    s_free: [...],
+    s_ninode: 2705,
+    s_inode: [...],
+    s_flock: 0,
+    s_ilock: 0,
+    s_fmod: 0,
+    s_ronly: 0,
+    s_time: [
+        2780,
+        814,
+    ],
+    s_pad: [...],
+}

@@ -13,6 +13,7 @@ signal-hook = "0.3.14"
 
 [profile.release]
 panic = "abort"
+debug-assertions = false
 
 [profile.dev]
 panic = "abort"
