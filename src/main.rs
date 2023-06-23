@@ -1,11 +1,6 @@
 use std::io;
 
 use v6sh::parser::BlockDeviceParser;
-
-mod block;
-mod def;
-mod shell;
-mod utils;
 mod v6sh;
 
 static BLOCK_FILE: &'static str = "v6root";
@@ -16,7 +11,8 @@ fn main() {
 
     let mut bm = BlockDeviceParser::new(bytes);
     let nodes = bm.parse().unwrap();
-    println!("{}", nodes.len());
+
+    println!("inodes len: {}", nodes.len());
     println!("------------------- hello, v6sh");
 
     let mut current_node = nodes[1].clone();
@@ -30,25 +26,31 @@ fn main() {
 
         match args[0] {
             "ls" => {
-                let _ = &current_node.ls();
+                if args.len() == 1 {
+                    let _ = &current_node.ls();
+                } else {
+                    match args[1] {
+                        "-l" => {
+                            for (_, name) in current_node.metadata.keys.iter().enumerate() {
+                                let id = current_node.get_nodeId_from_table(name.to_string());
+                                let child_node = nodes[id as usize].clone();
+
+                                child_node.parse_permission_info(name.to_string());
+                            }
+                        }
+                        _ => {panic!("invalid option");}
+                    }
+                }
             },
+
             "cd" => {
                 let id = current_node.get_nodeId_from_table(args[1].to_string());
                 println!("move --> {}", id);
                 current_node = nodes[id as usize].clone();
             },
-            "lsl" => {
-                let mut content = String::new();
-                // let joined_lines = current_node.metadata.keys.join("\n");
 
-                for (i, name) in current_node.metadata.keys.iter().enumerate() {
-                    let id = current_node.get_nodeId_from_table(name.to_string());
-                    let child_node = nodes[id as usize].clone();
-                    child_node.parse_permission_info(name.to_string());
-                }
-            },
             _ => {
-
+                panic!("invalid command");
             }
         }
     }

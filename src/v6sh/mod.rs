@@ -1,7 +1,4 @@
-use crate::def::*;
-use crate::utils;
 use std::{
-    error::Error,
     fs::File,
     io::{self, Read},
 };
@@ -9,14 +6,6 @@ use std::{
 pub mod inode;
 pub mod parser;
 
-use self::inode::Inode;
-
-const BLOCK_SIZE: usize = 512;
-const i32_BYTES_SIZE: usize = 4;
-const i16_BYTES_SIZE: usize = 2;
-const u16_BYTES_SIZE: usize = 2;
-
-const DIR_SIZE: usize = 16;
 
 #[derive(Debug, Clone)]
 pub struct filSys {
@@ -61,18 +50,4 @@ pub fn get_block_bytes_data(file_name: &str) -> io::Result<Vec<u8>> {
 
     // utils::print_bytes_vec(&all_bytes);
     return Ok(all_bytes);
-}
-
-struct Shell {
-    inodes: Vec<Inode>,
-    current_path: String,
-}
-
-impl Shell {
-    pub fn ls(&self, option: &str) {
-        match option {
-            "-l" => {}
-            _ => {}
-        }
-    }
 }
