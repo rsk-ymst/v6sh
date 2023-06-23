@@ -219,10 +219,10 @@ impl BlockDeviceParser {
     pub fn parse_single_inode(&mut self) -> Inode {
         let mut node = Inode::new();
 
-        node.i_mode = self.read_then_consume_i16().unwrap();
+        node.i_mode  = self.read_then_consume_i16().unwrap();
         node.i_nlink = self.read_then_consume_u8().unwrap();
-        node.i_uid = self.read_then_consume_u8().unwrap();
-        node.i_gid = self.read_then_consume_u8().unwrap();
+        node.i_uid   = self.read_then_consume_u8().unwrap();
+        node.i_gid   = self.read_then_consume_u8().unwrap();
         node.i_size0 = self.read_then_consume_u8().unwrap() as i8;
         node.i_size1 = self.read_then_consume_u16().unwrap();
 
