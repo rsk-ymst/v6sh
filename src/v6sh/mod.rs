@@ -63,3 +63,21 @@ pub fn get_block_bytes_data(file_name: &str) -> io::Result<Vec<u8>> {
     // utils::print_bytes_vec(&all_bytes);
     return Ok(all_bytes);
 }
+
+struct Shell {
+    inodes: Vec<Inode>,
+    current_path: String,
+}
+
+impl Shell {
+    pub fn ls(&self, option: &str) {
+        match option {
+            "-l" => {
+
+            }
+            _ => {
+
+            }
+        }
+    }
+}

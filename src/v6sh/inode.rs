@@ -54,13 +54,18 @@ impl Inode {
         println!("{joined_lines}");
     }
 
-    pub fn ls(&self) {
-        let mut content = String::new();
-        let joined_lines = self.metadata.keys.join("\n");
-        // let x = format!("{:#?}", self.metadata.keys);
+    // pub fn ls_l(&self) {
+    //     let mut content = String::new();
+    //     let joined_lines = self.metadata.keys.join("\n");
 
-        println!("{joined_lines}");
-    }
+    //     for (i, name) in self.metadata.keys.iter().enumerate() {
+    //         let x = self.get_nodeId_from_table(name);
+    //     }
+
+    //     // let x = format!("{:#?}", self.metadata.keys);
+
+    //     println!("{joined_lines}");
+    // }
 
     // pub fn cd(&self, path: &str) {
     //     self.
@@ -68,6 +73,29 @@ impl Inode {
 
     pub fn get_nodeId_from_table(&self, name: String) -> i32 {
         *self.metadata.fTable.get(name.as_str()).unwrap()
+    }
+
+    pub fn parse_permission_info(&self, name: String) {
+        let is_dir = if self.metadata.is_dir {"d"} else {"-"};
+
+        let user_r = if self.i_mode & 0b_0000_0000_0010_0000 != 0 {"r"} else {"-"};
+        let user_w = if self.i_mode & 0b_0000_0000_0100_0000 != 0 {"w"} else {"-"};
+        let user_x = if self.i_mode & 0b_0000_0000_1000_0000 != 0 {"x"} else {"-"};
+        // let user_r = if self.i_mode & 1 != 1 {"r"} else {"-"};
+        // let user_w = if self.i_mode & 2 != 1 {"w"} else {"-"};
+        // let user_x = if self.i_mode & 4 != 1 {"x"} else {"-"};
+
+        let group_r = if self.i_mode & 0b_0000_0000_0000_1000 != 0 {"r"} else {"-"};
+        let group_w = if self.i_mode & 0b_0000_0000_0001_0000 != 0 {"w"} else {"-"};
+        let group_x = if self.i_mode & 0b_0000_0000_0010_0000 != 0 {"x"} else {"-"};
+
+        let other_r = if self.i_mode & 0b_0000_0000_0000_0001 != 0 {"r"} else {"-"};
+        let other_w = if self.i_mode & 0b_0000_0000_0000_0010 != 0 {"w"} else {"-"};
+        let other_x = if self.i_mode & 0b_0000_0000_0000_0100 != 0 {"x"} else {"-"};
+
+
+        let x = format!("{is_dir}{user_r}{user_w}{user_x}{group_r}{group_w}{group_x}{other_r}{other_w}{other_x} {:>8} {:>8}", self.metadata.size, name);
+        println!("{x}");
     }
 
     // pub fn parseInodeBlock()
