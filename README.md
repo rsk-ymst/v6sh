@@ -1,6 +1,6 @@
 # UNIX V6 デバイスのパーサー
 
-![select](https://github.com/rsk-ymst/v6sh/assets/81950820/c444d568-6531-480d-8c5b-cf308c5d4451)
+<img src="https://github.com/rsk-ymst/v6sh/assets/81950820/c47f2280-6891-475f-81bf-53dc8989ca98.jpg" width="300">
 
 ### v6sh
 - main.rs        : エントリポイント
