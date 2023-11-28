@@ -1,4 +1,4 @@
-# UNIX V6 デバイスのパーサー
+# UNIX V6 ブロックデバイス解析器
 
 <img src="https://github.com/rsk-ymst/v6sh/assets/81950820/c47f2280-6891-475f-81bf-53dc8989ca98.jpg" width="300">
 
